@@ -25,16 +25,16 @@ public class AuthenticationInterceptor extends InterceptorAdapter {
     public boolean incomingRequestPostProcessed(
       RequestDetails theRequestDetails, HttpServletRequest theRequest, HttpServletResponse theResponse)
       throws AuthenticationException {
-      // Process this header
+        // Process this header
         String authHeader = theRequestDetails.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new AuthenticationException(Msg.code(642) + "Missing or invalid Authorization header");
         }
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost request = new HttpPost("http://host.docker.internal:9090/realms/HEMEO/protocol/openid-connect/token/introspect");
+            HttpPost request = new HttpPost(System.getenv("IAM_INTROSPECTION_ENDPOINT"));
             StringEntity requestEntity = new StringEntity("token=" + authHeader.split(" ")[1]);
-            request.setHeader("Authorization", "Basic aGVtZW86RUp3VXdDZ2xWelJOZ1YwejZ3dDJpR3JrOUpzc0JhQlQ=");
+            request.setHeader("Authorization", "Basic " + System.getenv("IAM_CLIENT_AUTH"));
             request.setHeader("Content-Type", "application/x-www-form-urlencoded");
             request.setEntity(requestEntity);
 

@@ -44,7 +44,9 @@ FROM gcr.io/distroless/java17-debian12:nonroot AS default
 USER 65532:65532
 WORKDIR /app
 
+COPY --from=busybox:1.35.0-uclibc /bin/sh /bin/sh
 COPY --chown=nonroot:nonroot --from=build-distroless /app /app
+COPY --from=build-hapi /usr/bin/curl /usr/bin/curl
 COPY --chown=nonroot:nonroot --from=build-hapi /tmp/hapi-fhir-jpaserver-starter/opentelemetry-javaagent.jar /app
 
 ENTRYPOINT ["java", "--class-path", "/app/main.war", "-Dloader.path=main.war!/WEB-INF/classes/,main.war!/WEB-INF/,/app/extra-classes", "org.springframework.boot.loader.PropertiesLauncher"]
